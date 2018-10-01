@@ -2,7 +2,6 @@ package main
 
 import (
 	"html/template"
-	"io/ioutil"
 	"log"
 	"net/http"
 )
@@ -14,13 +13,14 @@ func main() {
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-	f, _ := ioutil.ReadFile("templates/index.html")
-	t, _ := template.ParseFiles("templates/index.html")
-	t.Execute(w, f)
+	renderTemplate(w, "index", r)
 }
 
 func twitter(w http.ResponseWriter, r *http.Request) {
-	f, _ := ioutil.ReadFile("templates/twitter.html")
-	t, _ := template.ParseFiles("templates/twitter.html")
-	t.Execute(w, f)
+	renderTemplate(w, "twitter", r)
+}
+
+func renderTemplate(w http.ResponseWriter, fname string, r *http.Request) {
+	t, _ := template.ParseFiles("templates/base.html", "templates/"+fname+".html")
+	t.ExecuteTemplate(w, "base", "")
 }
