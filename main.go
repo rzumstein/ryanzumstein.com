@@ -13,7 +13,11 @@ func main() {
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-	renderTemplate(w, "index", r)
+	if r.URL.Path == "/" {
+		renderTemplate(w, "index", r)
+		return
+	}
+	http.Error(w, "404 Not Found", http.StatusNotFound)
 }
 
 func twitter(w http.ResponseWriter, r *http.Request) {
