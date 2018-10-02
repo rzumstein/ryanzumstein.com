@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
 )
@@ -9,6 +11,8 @@ import (
 func main() {
 	http.HandleFunc("/", index)
 	http.HandleFunc("/twitter", twitter)
+	http.HandleFunc("/resume", resume)
+	http.HandleFunc("/robots.txt", robots)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
@@ -24,7 +28,24 @@ func twitter(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, "twitter", r)
 }
 
+func resume(w http.ResponseWriter, r *http.Request) {
+	renderTemplate(w, "resume", r)
+}
+
+func robots(w http.ResponseWriter, r *http.Request) {
+	content, err := ioutil.ReadFile("robots.txt")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	fmt.Fprintf(w, "%s", content)
+}
+
 func renderTemplate(w http.ResponseWriter, fname string, r *http.Request) {
-	t, _ := template.ParseFiles("templates/base.html", "templates/"+fname+".html")
+	t, err := template.ParseFiles("templates/base.html", "templates/"+fname+".html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	t.ExecuteTemplate(w, "base", "")
 }
